@@ -1657,9 +1657,9 @@ const Message: FC<OwnProps & StateProps> = ({
           />
         )}
       </div>
-      <div className="onlick-buttons-container">
+      {/* <div className="onlick-buttons-container">
         <OnlikActionsButtons message={message} />
-      </div>
+      </div> */}
       {contextMenuAnchor && (
         <ContextMenuContainer
           isOpen={isContextMenuOpen}

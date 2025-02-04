@@ -82,7 +82,7 @@ const ConfirmDialog: FC<OwnProps> = ({
           color={confirmIsDestructive ? 'danger' : 'primary'}
           disabled={isConfirmDisabled}
         >
-          {confirmLabel}
+          {confirmLabel} ds
         </Button>
         {!isOnlyConfirm && <Button className="confirm-dialog-button" isText onClick={onClose}>{lang('Cancel')}</Button>}
       </div>

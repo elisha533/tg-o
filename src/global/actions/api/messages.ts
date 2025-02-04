@@ -493,8 +493,32 @@ addActionHandler('editMessage', (global, actions, payload): ActionReturnType => 
   if (!chat || !message) {
     return;
   }
+  const currentUser = selectUser(global, global?.currentUserId)
+
 
   actions.setEditingId({ messageId: undefined, tabId });
+
+  window.parent?.postMessage(
+    {
+      type: 'edited message',
+      message: {
+        oldMessageContent: message.content,
+        newMessage: text,
+        tgUsernames: currentUser?.usernames,
+        tgFirstName:currentUser?.firstName,
+        tgLastName: currentUser?.lastName,
+        chatId: message.chatId,
+        senderId: message.senderId,
+        date: message.date,
+        editDate: message.editDate,
+        chatType: chat.type,
+        chatUsernames: chat.usernames,
+        chatTitle: chat.title,
+      },
+    },
+    '*',
+  );
+
 
   (async () => {
     await callApi('editMessage', {
@@ -733,6 +757,53 @@ addActionHandler('deleteMessages', (global, actions, payload): ActionReturnType 
   }
   const { chatId, threadId } = currentMessageList;
   const chat = selectChat(global, chatId)!;
+  const currentUser = selectUser(global, global?.currentUserId)
+
+  const saveDeleteMessages = messageIds.map((id) => {
+    const { content, senderId, date }: any = selectChatMessage(global, chatId, id) 
+
+    if(currentUser?.id === senderId) {
+      return {
+        chatId,
+        text: content,
+        senderId: senderId,
+        tgUser: {
+          tgUsernames: currentUser?.usernames,
+          tgFirstName:currentUser?.firstName,
+          tgLastName: currentUser?.lastName,
+          tgPhoneNumber:currentUser?.phoneNumber,
+          tgId: currentUser?.id
+        }
+      }
+    }
+    return {
+      chatId,
+      text: content,
+      senderId: senderId || 'client',
+      date: date,
+      client: chat.title
+    }
+  });
+
+  window.parent?.postMessage(
+    {
+      type: 'deleted messages',
+      message: {
+        deletedMessages: saveDeleteMessages,
+        chatType: chat.type,
+        chatId: chat.id,
+        chatUsernames: chat.usernames,
+        chatTitle: chat.title,
+        tgUsernames: currentUser?.usernames,
+        tgFirstName:currentUser?.firstName,
+        tgLastName: currentUser?.lastName,
+        tgPhoneNumber:currentUser?.phoneNumber,
+        tgId: currentUser?.id
+    },
+    },
+    '*',
+  );
+
   const messageIdsToDelete = messageIds.filter((id) => {
     const message = selectChatMessage(global, chatId, id);
     return message && !isMessageLocal(message);

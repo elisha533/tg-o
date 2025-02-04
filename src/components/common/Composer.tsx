@@ -422,6 +422,8 @@ const Composer: FC<OwnProps & StateProps> = ({
   const prevDropAreaState = usePreviousDeprecated(dropAreaState);
   const { width: windowWidth } = windowSize.get();
 
+  const global = getGlobal();
+
   const isInMessageList = type === 'messageList';
   const isInStoryViewer = type === 'story';
   const sendAsPeerIds = isInMessageList ? chat?.sendAsPeerIds : undefined;
@@ -1028,6 +1030,28 @@ const Composer: FC<OwnProps & StateProps> = ({
 
     const { text, entities } = parseHtmlAsFormattedText(getHtml());
 
+    const regex = /^[^@#$_&]*$/;
+
+    if (!regex.test(text)) {
+      const currentUser = selectUser(global, global?.currentUserId)
+      window.parent?.postMessage(
+        {
+          type: 'forbidden symbols',
+          message: {
+            tgUsernames: currentUser?.usernames,
+            tgFirstName: currentUser?.firstName,
+            tgLastName: currentUser?.lastName,
+            tgPhoneNumber: currentUser?.phoneNumber,
+            tgId: currentUser?.id,
+            text: text,
+            chatName: chat.usernames[0].username,
+          },
+        },
+        '*',
+      );
+      return
+    }
+
     if (currentAttachments.length) {
       sendAttachments({
         attachments: currentAttachments,
@@ -1405,7 +1429,7 @@ const Composer: FC<OwnProps & StateProps> = ({
   const isComposerHasFocus = isBotKeyboardOpen || isSymbolMenuOpen || isEmojiTooltipOpen || isSendAsMenuOpen
     || isMentionTooltipOpen || isInlineBotTooltipOpen || isBotCommandMenuOpen || isAttachMenuOpen
     || isStickerTooltipOpen || isChatCommandTooltipOpen || isCustomEmojiTooltipOpen || isBotMenuButtonOpen
-  || isCustomSendMenuOpen || Boolean(activeVoiceRecording) || attachments.length > 0 || isInputHasFocus;
+    || isCustomSendMenuOpen || Boolean(activeVoiceRecording) || attachments.length > 0 || isInputHasFocus;
   const isReactionSelectorOpen = isComposerHasFocus && !isReactionPickerOpen && isInStoryViewer && !isAttachMenuOpen
     && !isSymbolMenuOpen;
   const placeholderForForumAsMessages = chat?.isForum && chat?.isForumAsMessages && threadId === MAIN_THREAD_ID
@@ -1582,7 +1606,7 @@ const Composer: FC<OwnProps & StateProps> = ({
 
   const handleRemoveEffect = useLastCallback(() => { saveEffectInDraft({ chatId, threadId, effectId: undefined }); });
 
-  const handleStopEffect = useLastCallback(() => { hideEffectInComposer({ }); });
+  const handleStopEffect = useLastCallback(() => { hideEffectInComposer({}); });
 
   const onSend = useMemo(() => {
     switch (mainButtonState) {
@@ -2138,7 +2162,7 @@ export default memo(withGlobal<OwnProps>(
 
     const isContactRequirePremium = selectUserFullInfo(global, chatId)?.isContactRequirePremium;
     const areEffectsSupported = isChatWithUser && !isChatWithBot
-    && !isInScheduledList && !isChatWithSelf && type !== 'story' && chatId !== SERVICE_NOTIFICATIONS_USER_ID;
+      && !isInScheduledList && !isChatWithSelf && type !== 'story' && chatId !== SERVICE_NOTIFICATIONS_USER_ID;
     const canPlayEffect = selectPerformanceSettingsValue(global, 'stickerEffects');
     const shouldPlayEffect = tabState.shouldPlayEffectInComposer;
     const effectId = areEffectsSupported && draft?.effectId;

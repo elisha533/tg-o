@@ -60,7 +60,7 @@ const App: FC<StateProps> = ({
   hasWebAuthTokenFailed,
   theme,
 }) => {
-  const { disconnect } = getActions();
+  const { disconnect, signOut } = getActions();
 
   const [isInactive, markInactive, unmarkInactive] = useFlag(false);
   const { isMobile } = useAppLayout();
@@ -206,6 +206,23 @@ const App: FC<StateProps> = ({
       theme === 'dark' ? DARK_THEME_BG_COLOR : LIGHT_THEME_BG_COLOR,
     );
   }, [theme]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      console.log('Received data:', event.data);
+
+      if (event.data === 'logout') {
+        signOut({ forceInitApi: true })
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
 
   return (
     <UiLoader page={page} isMobile={isMobile}>

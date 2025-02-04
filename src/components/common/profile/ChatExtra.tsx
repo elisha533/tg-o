@@ -167,6 +167,11 @@ const ChatExtra: FC<OwnProps & StateProps> = ({
     return result?.length ? result : undefined;
   }, [usernames]);
 
+  const params = new URLSearchParams(window.location.search);
+
+  const role = JSON.parse(params.get("role")); // true
+
+
   const activeChatUsernames = useMemo(() => {
     const result = !user ? chatUsernames?.filter((u) => u.isActive) : undefined;
 
@@ -342,14 +347,17 @@ const ChatExtra: FC<OwnProps & StateProps> = ({
           />
         </div>
       )}
-      {Boolean(formattedNumber?.length) && (
-        // eslint-disable-next-line react/jsx-no-bind
-        <ListItem icon="phone" multiline narrow ripple onClick={handlePhoneClick}>
-          <span className="title" dir={lang.isRtl ? 'rtl' : undefined}>{formattedNumber}</span>
-          <span className="subtitle">{oldLang('Phone')}</span>
-        </ListItem>
-      )}
-      {activeUsernames && renderUsernames(activeUsernames)}
+      {role ? (
+        <>
+          {Boolean(formattedNumber?.length) && (
+            <ListItem icon="phone" multiline narrow ripple onClick={handlePhoneClick}>
+              <span className="title" dir={lang.isRtl ? 'rtl' : undefined}>{formattedNumber}</span>
+              <span className="subtitle">{oldLang('Phone')}</span>
+            </ListItem>
+          )}
+          {activeUsernames && renderUsernames(activeUsernames)}
+        </>
+      ) : null}
       {description && Boolean(description.length) && (
         <ListItem
           icon="info"
@@ -387,7 +395,7 @@ const ChatExtra: FC<OwnProps & StateProps> = ({
       {birthday && (
         <UserBirthday key={peerId} birthday={birthday} user={user!} isInSettings={isInSettings} />
       )}
-      { hasMainMiniApp && (
+      {hasMainMiniApp && (
         <ListItem
           multiline
           isStatic

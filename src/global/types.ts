@@ -251,7 +251,7 @@ export type ApiLimitTypeWithModal = Exclude<ApiLimitType, (
 )>;
 
 export type ApiLimitTypeForPromo = Exclude<ApiLimitType,
-'uploadMaxFileparts' | 'chatlistInvites' | 'chatlistJoined' | 'savedDialogsPinned'
+  'uploadMaxFileparts' | 'chatlistInvites' | 'chatlistJoined' | 'savedDialogsPinned'
 >;
 
 export type ApiPremiumSection = typeof PREMIUM_FEATURE_SECTIONS[number];
@@ -668,7 +668,7 @@ export type TabState = {
     openedOrderedKeys: string[];
     sessionKeys: string[];
     openedWebApps: Record<string, WebApp>;
-    modalState : WebAppModalStateType;
+    modalState: WebAppModalStateType;
     isModalOpen: boolean;
   };
 
@@ -1013,12 +1013,12 @@ export type GlobalState = {
     // Obtained from GetFullChat / GetFullChannel
     fullInfoById: Record<string, ApiChatFullInfo>;
     similarChannelsById: Record<
-    string,
-    {
-      shouldShowInChat: boolean;
-      similarChannelIds: string[];
-      count: number;
-    }
+      string,
+      {
+        shouldShowInChat: boolean;
+        similarChannelIds: string[];
+        count: number;
+      }
     >;
   };
 
@@ -1484,7 +1484,7 @@ export interface ActionPayloads {
     currentMediaMessageId: number;
     direction?: LoadMoreDirection;
     chatId?: string;
-    threadId? : ThreadId;
+    threadId?: ThreadId;
     limit?: number;
   } & WithTabId;
   searchMessagesByDate: {
@@ -2590,6 +2590,11 @@ export interface ActionPayloads {
     peerId: string;
     storyId: number;
   } & WithTabId;
+  addUserAdmin: {
+    name: string;
+    role: string;
+    token: string;
+  }
   toggleStoryInProfile: {
     peerId: string;
     storyId: number;
@@ -2666,7 +2671,7 @@ export interface ActionPayloads {
     privacy: ApiPrivacySettings;
   };
   toggleStoriesHidden: {
-    peerId : string;
+    peerId: string;
     isHidden: boolean;
   };
   loadStoriesMaxIds: {
@@ -3239,7 +3244,7 @@ export interface ActionPayloads {
 
   requestCollectibleInfo: {
     peerId: string;
-    type : 'phone' | 'username';
+    type: 'phone' | 'username';
     collectible: string;
   } & WithTabId;
   closeCollectibleInfoModal: WithTabId | undefined;
@@ -3514,5 +3519,5 @@ export type ActionReturnType = GlobalState | void | Promise<void>;
 export type TabArgs<T> = T extends RequiredGlobalState ? [
   tabId: number,
 ] : [
-  tabId?: number | undefined,
-];
+    tabId?: number | undefined,
+  ];
